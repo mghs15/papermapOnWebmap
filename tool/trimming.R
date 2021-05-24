@@ -1,9 +1,6 @@
 #地図画像のトリミング（古い地図の装飾向け）
 
 library("jpeg")
-library("png")
-library("imager")
-library("rsvg")
 
 #df <- read.csv("out_WestGunma.json.csv", header = FALSE)
 
