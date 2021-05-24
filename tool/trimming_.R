@@ -70,7 +70,7 @@ pickupSdMean <- function(sd, mu){
   for(i in 1:n){
     if((i > 5) && (i < n-5)
        && (mu[i] <= threshhold) 
-       #&& (sd[i]>sd[i-1]) && (sd[i]>sd[i+1])  
+       #&& (sd[i]<sd[i-1]) && (sd[i]<sd[i+1])  
        && (mu[i]<mu[i-1]) && (mu[i]<mu[i+1])
        ){
       v <- c(v, i)
@@ -80,7 +80,7 @@ pickupSdMean <- function(sd, mu){
   check <- max(v) - min(v)
   #地図の領域が紙面全体の半分以下はないという仮定
   #半分以下なら、検出がうまくいっていないので、素直な抽出を行う
-  if( check < n*0.6 ){ 
+  if( check < n*0.5 ){ 
     print("a sub method used")
     v <- pickupSdMeanSub(sd, mu)
   }
@@ -88,15 +88,7 @@ pickupSdMean <- function(sd, mu){
   check <- max(v) - min(v)
   #地図の領域が紙面全体の半分以下はないという仮定
   #半分以下なら、検出がうまくいっていないので、素直な抽出を行う
-  if( check < n*0.6 ){ 
-    print("a sub 2 method used")
-    v <- pickupSdMeanSub2(sd, mu)
-  }
-  
-  check <- max(v) - min(v)
-  #地図の領域が紙面全体の半分以下はないという仮定
-  #半分以下なら、検出がうまくいっていないので、素直な抽出を行う
-  if( check < n*0.6 ){ 
+  if( check < n*0.5 ){ 
     print("a loose method used")
     v <- pickupSdMeanLoose(sd, mu)
   }
@@ -107,31 +99,12 @@ pickupSdMean <- function(sd, mu){
 
 pickupSdMeanSub <- function(sd, mu){
   v <- NULL
-  n <- length(sd)
-  nh <- floor(n/2)
-  threshhold <- max(min(sd[5:nh]), min(sd[(nh+1):(n-5)]))
-  for(i in 1:n){
-    if((i > 5) && (i < n-5)
-       && (sd[i] <= threshhold) 
-       && (sd[i]>sd[i-1]) && (sd[i]>sd[i+1])  
-       #&& (mu[i]<mu[i-1]) && (mu[i]<mu[i+1])
-    ){
-      v <- c(v, i)
-    }
-  }
-  
-  return(v)
-}
-
-pickupSdMeanSub2 <- function(sd, mu){
-  v <- NULL
   n <- length(mu)
-
   threshhold <- mean(mu)
   for(i in 1:n){
     if((i > 5) && (i < n-5)
        && (mu[i] <= threshhold) 
-       #&& (sd[i]<sd[i-1]) && (sd[i]<sd[i+1])  
+       && (sd[i]<sd[i-1]) && (sd[i]<sd[i+1])  
        && (mu[i]<mu[i-1]) && (mu[i]<mu[i+1])
     ){
       v <- c(v, i)
