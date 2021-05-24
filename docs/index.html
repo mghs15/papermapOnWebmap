@@ -43,23 +43,6 @@ body { margin:0; padding:0; }
 </head>
 <body>
 
-<!--
-<div id='menutop'>
-  <div id='menu'>
-    <table>
-      <tr>
-        <td>
-        <span id="loadingMessage">
-          <img src='https://gsi-cyberjapan.github.io/gsimaps/image/system/loading002.gif'>
-          <br>
-          ロード中...<br>少々お待ちください。
-        </span>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
--->
 <div id='map'></div>
 
 
@@ -75,8 +58,8 @@ const map = new mapboxgl.Map({
   container: 'map', // container id
   hash: true, //add #position on URL
   style: './style.json', // stylesheet location
-  center: [139.179, 35.2985], // starting position [lng, lat]
-  zoom: 11, // starting zoom
+  center: [138.9192, 36.2591], // starting position [lng, lat]
+  zoom: 9, // starting zoom
   minZoom: 6,
   maxZoom: 17.99,
   attributionControl: false,
