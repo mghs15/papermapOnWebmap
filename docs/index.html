@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<title>pp</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<style>
+body { margin:0; padding:0; }
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+#menutop{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1000000;
+  display:;
+}
+
+#menu {
+    position: relative;
+    padding: 0.5% 2.5% ;
+    margin: 0 0;
+    box-shadow: 0px 0px 0px 0px #eeeeee;
+    font-family: 'Open Sans', sans-serif;
+    width:100%;
+    height: 100%;
+    //max-width: 350px;
+    text-align: center;
+}
+
+#menu table {
+ padding: 0.5% 2.5% ;
+ width: 100%;
+ height: 100%;
+}
+
+</style>
+</head>
+<body>
+
+<!--
+<div id='menutop'>
+  <div id='menu'>
+    <table>
+      <tr>
+        <td>
+        <span id="loadingMessage">
+          <img src='https://gsi-cyberjapan.github.io/gsimaps/image/system/loading002.gif'>
+          <br>
+          ロード中...<br>少々お待ちください。
+        </span>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+-->
+<div id='map'></div>
+
+
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.13.1/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.13.1/mapbox-gl.css' rel='stylesheet' />
+
+<script>
+
+/*************************************************/
+/*Mapbox 画像表示用 関係設定                     */
+/*************************************************/
+const map = new mapboxgl.Map({
+  container: 'map', // container id
+  hash: true, //add #position on URL
+  style: './style.json', // stylesheet location
+  center: [139.179, 35.2985], // starting position [lng, lat]
+  zoom: 11, // starting zoom
+  minZoom: 6,
+  maxZoom: 17.99,
+  attributionControl: false,
+  clickTolerance: 10,
+  localIdeographFontFamily: ['MS Gothic', 'Hiragino Kaku Gothic Pro', 'sans-serif']
+});
+
+
+map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+map.addControl(new mapboxgl.ScaleControl() );
+
+const myAttributionProp = {compact: true, customAttribution: []};
+const myAttribution = new mapboxgl.AttributionControl(myAttributionProp);
+map.addControl(myAttribution, 'top-right');
+
+map.showTileBoundaries = false;
+
+
+/*************************************************/
+/* 画像表示         関係設定                     */
+/*************************************************/
+
+const addGeojsonData = (path) => {
+
+    const layerid = "geojson";
+    const sourceid = "geojson";
+    
+    //初期化
+    //既存レイヤの削除
+    //既存ソースの削除
+    if(map.getLayer(layerid)){
+        map.removeLayer(layerid);
+        if(map.getSource(sourceid)){
+            map.removeSource(sourceid);
+        }
+    }
+    
+
+    map.addSource(sourceid, {
+      "type": "geojson",
+      "data": path
+    });
+    
+    map.addLayer({
+      'id': layerid,
+      'type': 'circle',
+      'source': sourceid,
+      'minzoom': 6,
+      'maxzoom': 22,
+      'layout': {
+        'visibility': 'visible'
+      },
+      'paint': {
+        'circle-radius': 8,
+        'circle-color': ['rgba', 
+          255, 
+          0, //["*", 2, ["to-number", ["slice", ["get", "撮影年月日"], 2, 4]]],
+          0, //["-", 255, ["*", 2, ["to-number", ["slice", ["get", "撮影年月日"], 2, 4]]]],
+          0.3]
+      }
+    });
+  
+
+}
+
+
+
+const addRasterImage = (info) => {
+    
+
+    const layerid = "image";
+    const sourceid = "image";
+    
+    //初期化
+    //既存レイヤの削除
+    //既存ソースの削除
+    if(map.getLayer(layerid)){
+        map.removeLayer(layerid);
+        if(map.getSource(sourceid)){
+            map.removeSource(sourceid);
+        }
+    }
+    
+    if(!info) return;
+    
+    const imageUrl = "./image/" + info.specificationId + ".jpg";
+    
+    map.loadImage( imageUrl, (error, image) => {
+    
+        if (error){
+          console.log(error); 
+          throw error;
+        }
+        
+        console.log(image);
+        const w = image.width/100;
+        const h = image.height/100;
+        
+        
+        map.addSource(sourceid, {
+  			"type": "image",
+  			"url": imageUrl,
+  			"coordinates": JSON.parse(info.bbox)
+            //type=imageでは、"attribution"をとれない。
+        });
+        
+        map.addLayer({
+  			"id": layerid,
+  			"type": "raster",
+  			"source": "image"
+        });
+        
+        //map.removeControl(myAttribution);
+        myAttributionProp.customAttribution.push("<a href=\"https://mapps.gsi.go.jp/\" target=\"_blank\">地図・空中写真閲覧サービス</a>");
+        //map.addControl(myAttribution, 'top-right');
+
+    });
+    
+    
+} 
+
+
+map.on('load', () => {
+  addGeojsonData("out_WestGunma.json.geojson");
+});
+
+map.on('click', (e) => {
+
+  console.log(e);
+  
+  //レンダリングされた地物を取得
+  const features = map.queryRenderedFeatures(e.point);
+  if (!features.length) {
+    addRasterImage();
+    return;
+  }
+  
+  const htmlString = ""; //ポップアップ
+  
+  const feature = features[0]; //一番上のものだけ表示
+  console.log(feature);
+  
+  const info = feature.properties
+  
+  
+  addRasterImage(info);
+  
+  
+});
+
+</script>
+
+
+</body>
+</html>
