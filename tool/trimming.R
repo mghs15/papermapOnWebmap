@@ -55,16 +55,17 @@ for(name in flist){
     nnr <- length(hintRow)
     startRow <- hintRow[1] + 15
     
-    checkR <- hintRow[nnr] - hintRow[1] 
     #endRow <- hintRow[nnr] -15
+    
+    #checkR <- hintRow[nnr] - hintRow[1] 
     #スケールバー対応(微妙)
     #白の要素の数を数えた方が良いかも？
     oT_check_col <- oT_target_col[,c(c(0:10))]
     muRow_check <- apply(oT_check_col, 1, mean)
     if(muRow_check < 0.7){
-      endRow <- hintRow[nnr-1] -15
-    }else{
       endRow <- hintRow[nnr] -15
+    }else{
+      endRow <- hintRow[nnr] -30
     }
     
     
