@@ -82,10 +82,11 @@ map.showTileBoundaries = false;
 /* 画像表示         関係設定                     */
 /*************************************************/
 
-const addGeojsonData = (path) => {
+const addPointData = () => {
 
-    const layerid = "geojson";
-    const sourceid = "geojson";
+
+    const layerid = "omtile";
+    const sourceid = "omtile";
     
     //初期化
     //既存レイヤの削除
@@ -97,17 +98,25 @@ const addGeojsonData = (path) => {
         }
     }
     
+    
+    const root = "https://mghs15.github.io/papermapOnWebmap/";
 
     map.addSource(sourceid, {
-      "type": "geojson",
-      "data": path
+            "type": "vector",
+            "tiles": [
+                root  + "/xyz/oldmap/{z}/{x}/{y}.pbf"
+            ],
+            "minzoom": 8,
+            "maxzoom": 8,
+            "attribution": "<a href=\"https://mapps.gsi.go.jp/\" target=\"_blank\">地図・空中写真閲覧サービス</a>"
     });
     
     map.addLayer({
       'id': layerid,
       'type': 'circle',
       'source': sourceid,
-      'minzoom': 6,
+      'source-layer': "oldmap",
+      'minzoom': 8,
       'maxzoom': 22,
       'layout': {
         'visibility': 'visible'
@@ -116,8 +125,8 @@ const addGeojsonData = (path) => {
         'circle-radius': 8,
         'circle-color': ['rgba', 
           255, 
-          0, //["*", 2, ["to-number", ["slice", ["get", "撮影年月日"], 2, 4]]],
-          0, //["-", 255, ["*", 2, ["to-number", ["slice", ["get", "撮影年月日"], 2, 4]]]],
+          0, 
+          0, 
           0.3]
       }
     });
@@ -183,7 +192,7 @@ const addRasterImage = (info) => {
 
 
 map.on('load', () => {
-  addGeojsonData("out_WestGunma.json.geojson");
+  addPointData();
 });
 
 map.on('click', (e) => {

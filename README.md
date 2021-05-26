@@ -14,6 +14,9 @@ https://mghs15.github.io/papermapOnWebmap/
 * 画像位置を表示するGeoJSONを作る。
 →`process_searchdata2geojson.js`
 
+* Mapbox GL JSでなんやかんやして、画像を地図上に張り付ける。
+うまくいけば「だいたい合ってる」という感想が得られる。
+
 
 ## 出典
 ### 画像コンテンツ・付属情報
